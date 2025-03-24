@@ -1,0 +1,23 @@
+customer
+fan
+artist
+inventory
+buying
+paying
+credit card
+record label
+review
+search
+recommendation
+order
+address
+warehouse
+sender
+posting
+CD
+
+
+buying a CD (Customer)
+finding a CD (Customer)
+leaving a review (Customer)
+restocking CD (Label)
