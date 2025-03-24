@@ -46,4 +46,23 @@ class CdWarehouseTest(unittest.TestCase):
         self.assertEqual({"Foo Fighters": 2, "Oasis": 10}, warehouse.inventory())
                 
         
+    def test_stock_update(self):
+        cc_processor = CcMock(True)
+        warehouse = Warehouse({"Foo Fighters":{"price":9.95, "stock":2},
+                               "Oasis":{"price":3.95, "stock": 10}}, cc_processor)
+        
+        warehouse.buy_cd("Foo Fighters", "12345")
+        
+        self.assertEqual({"Foo Fighters": 1, "Oasis": 10}, warehouse.inventory())
+       
 
+    def test_sold_out(self):
+        cc_processor = CcMock(True)
+        warehouse = Warehouse({"Foo Fighters":{"price":9.95, "stock":2},
+                               "Oasis":{"price":3.95, "stock": 10}}, cc_processor)
+        
+        warehouse.buy_cd("Foo Fighters", "12345")
+        warehouse.buy_cd("Foo Fighters", "67890")
+        
+        self.assertEqual({"Foo Fighters": 0, "Oasis": 10}, warehouse.inventory())
+       

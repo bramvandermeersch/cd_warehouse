@@ -24,7 +24,7 @@ class Warehouse:
             if item['stock'] > 1:
                 item['stock'] = item['stock'] - 1
             else:
-                del self.cds[album]
+                item['stock'] = 0
 
     def inventory(self):
         return {album: item['stock'] for album, item in self.cds.items()}
