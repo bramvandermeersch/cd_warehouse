@@ -38,6 +38,12 @@ class CdWarehouseTest(unittest.TestCase):
         self.assertEqual(["Foo Fighters"], warehouse.find_albums('Foo Fighters'))
         self.assertEqual(["Oasis"], warehouse.find_albums('sis'))
         
-    
+    def test_get_warehouse_stock(self):
+        cc_processor = CcMock(False)
+        warehouse = Warehouse({"Foo Fighters":{"price":9.95, "stock":2},
+                               "Oasis":{"price":3.95, "stock": 10}}, cc_processor)
+        
+        self.assertEqual({"Foo Fighters": 2, "Oasis": 10}, warehouse.inventory())
+                
         
 

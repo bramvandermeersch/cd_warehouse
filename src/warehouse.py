@@ -26,5 +26,8 @@ class Warehouse:
             else:
                 del self.cds[album]
 
+    def inventory(self):
+        return {album: item['stock'] for album, item in self.cds.items()}
+
     def find_albums(self, search_string):
         return [album for album in self.cds.keys() if search_string in album]
