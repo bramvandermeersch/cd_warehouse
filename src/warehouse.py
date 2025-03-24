@@ -17,7 +17,8 @@ class Warehouse:
     
     def check_stock(self, album):
         if album := self.cds.get(album):
-            return album
+            if album['stock'] > 0:
+                return album
         
     def remove_from_inventory(self, album):
         if item := self.cds.get(album):
@@ -30,4 +31,4 @@ class Warehouse:
         return {album: item['stock'] for album, item in self.cds.items()}
 
     def find_albums(self, search_string):
-        return [album for album in self.cds.keys() if search_string in album]
+        return [album for album, item in self.cds.items() if search_string in album and item['stock'] > 0]
