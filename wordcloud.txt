@@ -1,0 +1,37 @@
+customer
+fan
+artist
+inventory
+buying
+paying
+credit card
+record label
+review
+search
+recommendation
+order
+address
+warehouse
+sender
+posting
+CD
+
+
+buying a CD (Customer)
+- assume CD exist
+- CD in stock 
+- CD is not in stock
+- cc fails
+- cc success
+
+finding a CD (Customer) on artist and title
+- No match
+- one match
+- multiple matches
+
+leaving a review (Customer)
+- customer bought CD
+- customer didn't buy CD
+
+restocking CD (Label)
+- add new batch of CDs
