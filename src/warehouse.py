@@ -1,6 +1,7 @@
 class Warehouse:
-    def __init__(self, cds):
+    def __init__(self, cds, cc_processor):
         self.cds = cds
+        self.cc_processor = cc_processor
         
     def buy_cd(self, album, cc_info):
         if stock_info := self.check_stock(album):
@@ -12,7 +13,7 @@ class Warehouse:
             
     def authorise_payment(self, price, cc_info):
         # always succeeds for now...
-        return True
+        return self.cc_processor.authorise(price, cc_info)
     
     def check_stock(self, album):
         if album := self.cds.get(album):
