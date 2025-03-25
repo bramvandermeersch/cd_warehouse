@@ -6,33 +6,39 @@ class Cd:
         self.price = price
         self.stock = stock
 
-    def remove_from_inventory(self):
-        if self.stock > 1:
-            self.stock = self.stock - 1
+    def remove_from_inventory(self, count = 1):
+        if self.stock > count:
+            self.stock = self.stock - count
         else:
             self.stock = 0
 
+    def  check_stock(self, count = 1):
+        return self.stock >= count
 
-class Warehouse:
-    def __init__(self, cd_store, cc_processor, chars_notfiier = None):
-        self.cd_store = cd_store
-        self.cc_processor = cc_processor
-        self.charts_notifier = chars_notfiier
-        
-    def buy_cd(self, album_name, cc_info):
-        if cd := self.check_stock(album_name):
-            if self.authorise_payment(cd.price, cc_info):
-                cd.remove_from_inventory()
-                if self.charts_notifier:
-                    self.charts_notifier.notify(cd.artist, cd.title)
+    def buy_cd(self, count, cc_info, notifier = None):
+        if self.check_stock(count):
+            if cc_info.authorise(self.price * count):
+                self.remove_from_inventory(count)
+                if notifier:
+                    notifier.notify(self.artist, self.title, count)
                 return True
             
         return False
             
-    def authorise_payment(self, price, cc_info):
-        # always succeeds for now...
-        return self.cc_processor.authorise(price, cc_info)
-    
+
+
+class Warehouse:
+    def __init__(self, cd_store, charts_notfier = None):
+        self.cd_store = cd_store
+        self.charts_notifier = charts_notfier
+
+    def buy_cd(self, album_name, cc_info, count=1):
+        if cd := self.cd_store.get(album_name):
+            return cd.buy_cd(count, cc_info, self.charts_notifier)
+        
+        return False
+        
+   
     def check_stock(self, album_name):
         if cd := self.cd_store.get(album_name):
             if cd.stock > 0:
