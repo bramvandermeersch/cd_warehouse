@@ -8,7 +8,6 @@ class CcMock():
     def authorise(self, price, cc_info):
         return self.result
 
-
 class CdWarehouseTest(unittest.TestCase):
     def test_buy_single_cd(self):
         warehouse = Warehouse({"Foo Fighters":Cd("Foo Fighters", "Foo Fighters", "1998", 9.95, 2)}, CcMock(True))
