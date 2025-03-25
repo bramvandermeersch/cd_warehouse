@@ -32,6 +32,9 @@ class Cd:
                 return True
             
         return False
+    
+    def is_related(self, search_string, min_stock=1):
+        return ((search_string in self.artist) or (search_string in self.title)) and (self.stock >= min_stock)
             
 
 
@@ -45,12 +48,6 @@ class Warehouse:
             return cd.buy_cd(count, cc_info, self.charts_notifier)
         
         return False
-        
-   
-    def check_stock(self, album_name):
-        if cd := self.cd_store.get(album_name):
-            if cd.stock > 0:
-                return cd
          
     def inventory(self):
         return {album: item.stock for album, item in self.cd_store.items()}
@@ -58,6 +55,6 @@ class Warehouse:
     def find_albums(self, search_string):
         albums = []
         for album_name, cd in self.cd_store.items():
-            if ((search_string in cd.artist) or (search_string in cd.title)) and (cd.stock > 0):
+            if cd.is_related(search_string):
                 albums.append(album_name)
         return albums
