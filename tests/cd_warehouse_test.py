@@ -126,7 +126,40 @@ class CdWarehouseTest(unittest.TestCase):
         warehouse.buy_cd("Foo Fighters", cc_processor, 2)
         cc_processor.authorise.assert_called_once_with(16)
         
+
+    def test_competitor_price_match_no_top_100(self):
+        cc_processor = CcStub(True)
+        cc_processor.authorise = MagicMock()
+
+        # our competitor has Foo Fighter 1998 for 9.00 and it is at place 56 in the chart
+        charts_interface = ChartsUpdater(101, 9.00)
+
         
+        # we have 2x Foo Fighters in the warehouse
+        warehouse = Warehouse({"Foo Fighters":Cd("Foo Fighters", "Foo Fighters", "1998", 9.95, 2),
+                               "Oasis":Cd("Oasis", "Oasis", "1995", 3.95, 10)}, charts_interface)
+        
+        warehouse.buy_cd("Foo Fighters", cc_processor, 2)
+        cc_processor.authorise.assert_called_once_with(19.90)
+
+    
+    def test_competitor_price_match_100_higher_price(self):
+        cc_processor = CcStub(True)
+        cc_processor.authorise = MagicMock()
+
+        # our competitor has Foo Fighter 1998 for 9.00 and it is at place 56 in the chart
+        charts_interface = ChartsUpdater(56, 10.00)
+
+        
+        # we have 2x Foo Fighters in the warehouse
+        warehouse = Warehouse({"Foo Fighters":Cd("Foo Fighters", "Foo Fighters", "1998", 9.95, 2),
+                               "Oasis":Cd("Oasis", "Oasis", "1995", 3.95, 10)}, charts_interface)
+        
+        warehouse.buy_cd("Foo Fighters", cc_processor, 2)
+        cc_processor.authorise.assert_called_once_with(19.90)
+
+    
+                
 
 if __name__ == '__main__':
     unittest.main()
