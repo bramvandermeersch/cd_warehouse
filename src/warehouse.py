@@ -22,8 +22,7 @@ class Cd:
             if notifier:
                 position, best_price = notifier.get_chart_data(self.artist, self.title)
                 if (position <= 100 ):
-                    if best_price < price:
-                        price = best_price - 1
+                    price = min(price, best_price - 1)
 
             if cc_info.authorise(price * count):
                 self.remove_from_inventory(count)

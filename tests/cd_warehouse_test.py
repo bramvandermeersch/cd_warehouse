@@ -147,7 +147,7 @@ class CdWarehouseTest(unittest.TestCase):
         cc_processor = CcStub(True)
         cc_processor.authorise = MagicMock()
 
-        # our competitor has Foo Fighter 1998 for 9.00 and it is at place 56 in the chart
+        # our competitor has Foo Fighter 1998 for 10.00 and it is at place 56 in the chart
         charts_interface = ChartsUpdater(56, 10.00)
 
         
@@ -156,7 +156,7 @@ class CdWarehouseTest(unittest.TestCase):
                                "Oasis":Cd("Oasis", "Oasis", "1995", 3.95, 10)}, charts_interface)
         
         warehouse.buy_cd("Foo Fighters", cc_processor, 2)
-        cc_processor.authorise.assert_called_once_with(19.90)
+        cc_processor.authorise.assert_called_once_with(18.00)
 
     
                 
