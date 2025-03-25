@@ -17,7 +17,14 @@ class Cd:
 
     def buy_cd(self, count, cc_info, notifier = None):
         if self.check_stock(count):
-            if cc_info.authorise(self.price * count):
+            price = self.price
+
+            if notifier:
+                position, best_price = notifier.get_chart_data(self.artist, self.title)
+                if (position <= 100 ):
+                    price = min(price, best_price - 1)
+                    
+            if cc_info.authorise(price * count):
                 self.remove_from_inventory(count)
                 if notifier:
                     notifier.notify(self.artist, self.title, count)
