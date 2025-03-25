@@ -12,25 +12,29 @@ class Cd:
         else:
             self.stock = 0
 
-    def  check_stock(self, count = 1):
+    def check_stock(self, count = 1):
         return self.stock >= count
 
-    def buy_cd(self, count, cc_info, notifier = None):
+    def buy_cd(self, count, cc_info, chart_interface = None):
         if self.check_stock(count):
-            price = self.price
-
-            if notifier:
-                position, best_price = notifier.get_chart_data(self.artist, self.title)
-                if (position <= 100 ):
-                    price = min(price, best_price - 1)
+            price = self.calculate_price(chart_interface)
 
             if cc_info.authorise(price * count):
                 self.remove_from_inventory(count)
-                if notifier:
-                    notifier.notify(self.artist, self.title, count)
+                if chart_interface:
+                    chart_interface.notify(self.artist, self.title, count)
                 return True
             
         return False
+
+    def calculate_price(self, chart_interface):
+        price = self.price
+
+        if chart_interface:
+            position, best_price = chart_interface.get_chart_data(self.artist, self.title)
+            if (position <= 100 ):
+                price = min(price, best_price - 1)
+        return price
     
     def is_related(self, search_string, min_stock=1):
         return ((search_string in self.artist) or (search_string in self.title)) and (self.stock >= min_stock)
