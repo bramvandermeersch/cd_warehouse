@@ -13,17 +13,18 @@ class Cd:
             self.stock = 0
 
 
-
-
 class Warehouse:
-    def __init__(self, cd_store, cc_processor):
+    def __init__(self, cd_store, cc_processor, chars_notfiier = None):
         self.cd_store = cd_store
         self.cc_processor = cc_processor
+        self.charts_notifier = chars_notfiier
         
     def buy_cd(self, album_name, cc_info):
         if cd := self.check_stock(album_name):
             if self.authorise_payment(cd.price, cc_info):
                 cd.remove_from_inventory()
+                if self.charts_notifier:
+                    self.charts_notifier.notify(cd.artist, cd.title)
                 return True
             
         return False

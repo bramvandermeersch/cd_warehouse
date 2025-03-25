@@ -1,35 +1,43 @@
 import unittest
+from unittest.mock import MagicMock
 
 from src.warehouse import Warehouse, Cd
 
-class CcMock():
+class CcStub():
     def __init__(self, result):
         self.result = result
     def authorise(self, price, cc_info):
         return self.result
+    
+class ChartsUpdater:
+    def __init__(self):
+        pass
 
+    def notify(self, artist, title):
+        return True
+        
 class CdWarehouseTest(unittest.TestCase):
     def test_buy_single_cd(self):
-        warehouse = Warehouse({"Foo Fighters":Cd("Foo Fighters", "Foo Fighters", "1998", 9.95, 2)}, CcMock(True))
+        warehouse = Warehouse({"Foo Fighters":Cd("Foo Fighters", "Foo Fighters", "1998", 9.95, 2)}, CcStub(True))
         self.assertEqual(True, warehouse.buy_cd('Foo Fighters', "12345"))
 
     def test_buy_non_existing_cd(self):
-        warehouse = Warehouse({"Foo Fighters":Cd("Foo Fighters", "Foo Fighters", "1998", 9.95, 2)}, CcMock(True))
+        warehouse = Warehouse({"Foo Fighters":Cd("Foo Fighters", "Foo Fighters", "1998", 9.95, 2)}, CcStub(True))
         self.assertEqual(False, warehouse.buy_cd('Oasis', "12345"))
 
     def test_buy_too_many_cds(self):
-        warehouse = Warehouse({"Foo Fighters":Cd("Foo Fighters", "Foo Fighters", "1998", 9.95, 2)}, CcMock(True))
+        warehouse = Warehouse({"Foo Fighters":Cd("Foo Fighters", "Foo Fighters", "1998", 9.95, 2)}, CcStub(True))
         self.assertEqual(True, warehouse.buy_cd('Foo Fighters', "12345"))
         self.assertEqual(True, warehouse.buy_cd('Foo Fighters', "12345"))
         self.assertEqual(False, warehouse.buy_cd('Foo Fighters', "12345"))
 
     def test_failed_auth(self):
-        cc_processor = CcMock(False)
+        cc_processor = CcStub(False)
         warehouse = Warehouse({"Foo Fighters":Cd("Foo Fighters", "Foo Fighters", "1998", 9.95, 2)}, cc_processor)
         self.assertEqual(False, warehouse.buy_cd('Foo Fighters', "12345"))
 
     def test_find_album(self):
-        cc_processor = CcMock(False)
+        cc_processor = CcStub(False)
         warehouse = Warehouse({"Foo Fighters":Cd("Foo Fighters", "Foo Fighters", "1998", 9.95, 2),
                                "Oasis":Cd("Oasis", "Oasis", "1995", 3.95, 10)}, cc_processor)
         
@@ -38,7 +46,7 @@ class CdWarehouseTest(unittest.TestCase):
         self.assertEqual(["Oasis"], warehouse.find_albums('sis'))
         
     def test_get_warehouse_stock(self):
-        cc_processor = CcMock(False)
+        cc_processor = CcStub(False)
         warehouse = Warehouse({"Foo Fighters":Cd("Foo Fighters", "Foo Fighters", "1998", 9.95, 2),
                                "Oasis":Cd("Oasis", "Oasis", "1995", 3.95, 10)}, cc_processor)
         
@@ -46,7 +54,7 @@ class CdWarehouseTest(unittest.TestCase):
                 
         
     def test_stock_update(self):
-        cc_processor = CcMock(True)
+        cc_processor = CcStub(True)
         warehouse = Warehouse({"Foo Fighters":Cd("Foo Fighters", "Foo Fighters", "1998", 9.95, 2),
                                "Oasis":Cd("Oasis", "Oasis", "1995", 3.95, 10)}, cc_processor)
         
@@ -56,7 +64,7 @@ class CdWarehouseTest(unittest.TestCase):
        
 
     def test_sold_out(self):
-        cc_processor = CcMock(True)
+        cc_processor = CcStub(True)
         warehouse = Warehouse({"Foo Fighters":Cd("Foo Fighters", "Foo Fighters", "1998", 9.95, 2),
                                "Oasis":Cd("Oasis", "Oasis", "1995", 3.95, 10)}, cc_processor)
         
@@ -67,7 +75,7 @@ class CdWarehouseTest(unittest.TestCase):
 
        
     def test_sold_out_find(self):
-        cc_processor = CcMock(True)
+        cc_processor = CcStub(True)
 
         # we have 2x Foo Fighters in the warehouse
 
@@ -80,3 +88,17 @@ class CdWarehouseTest(unittest.TestCase):
         # if we list what's in stock foo fighters should not be in the list
         # of albums if we're searching for it.
         self.assertEqual(False, "Foo Fighters" in warehouse.find_albums("Foo"))
+
+    def test_notify_record_label(self):
+        cc_processor = CcStub(True)
+        charts_interface = ChartsUpdater()
+
+        charts_interface.notify = MagicMock()
+        # we have 2x Foo Fighters in the warehouse
+
+        warehouse = Warehouse({"Foo Fighters":Cd("Foo Fighters", "Foo Fighters", "1998", 9.95, 2),
+                               "Oasis":Cd("Oasis", "Oasis", "1995", 3.95, 10)}, cc_processor, charts_interface)
+        
+        warehouse.buy_cd("Foo Fighters", "12345")
+        
+        charts_interface.notify.assert_called_with("Foo Fighters", "1998")
