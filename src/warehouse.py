@@ -6,6 +6,15 @@ class Cd:
         self.price = price
         self.stock = stock
 
+    def remove_from_inventory(self):
+        if self.stock > 1:
+            self.stock = self.stock - 1
+        else:
+            self.stock = 0
+
+
+
+
 class Warehouse:
     def __init__(self, cd_store, cc_processor):
         self.cd_store = cd_store
@@ -14,7 +23,7 @@ class Warehouse:
     def buy_cd(self, album_name, cc_info):
         if cd := self.check_stock(album_name):
             if self.authorise_payment(cd.price, cc_info):
-                self.remove_from_inventory(album_name)
+                cd.remove_from_inventory()
                 return True
             
         return False
@@ -28,13 +37,6 @@ class Warehouse:
             if cd.stock > 0:
                 return cd
          
-    def remove_from_inventory(self, album):
-        if item := self.cd_store.get(album):
-            if item.stock > 1:
-                item.stock = item.stock - 1
-            else:
-                item.stock = 0
-
     def inventory(self):
         return {album: item.stock for album, item in self.cd_store.items()}
 
